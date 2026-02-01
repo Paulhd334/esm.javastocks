@@ -28,14 +28,14 @@ public class TypeEpreuveService {
             if (rows > 0) {
                 ResultSet rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
-                    System.out.println("✅ Type d'épreuve créé avec ID: " + rs.getInt(1));
+                    System.out.println(">> Type d'épreuve créé avec ID: " + rs.getInt(1));
                 }
             }
             
             pstmt.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur création: " + e.getMessage());
+            System.err.println(">> Erreur création: " + e.getMessage());
         }
     }
     
@@ -58,15 +58,15 @@ public class TypeEpreuveService {
             
             int rows = pstmt.executeUpdate();
             if (rows > 0) {
-                System.out.println("✅ Type d'épreuve modifié!");
+                System.out.println(">> Type d'épreuve modifié!");
             } else {
-                System.out.println("❌ Type non trouvé!");
+                System.out.println(">> Type non trouvé!");
             }
             
             pstmt.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur modification: " + e.getMessage());
+            System.err.println(">> Erreur modification: " + e.getMessage());
         }
     }
     
@@ -88,13 +88,13 @@ public class TypeEpreuveService {
                 System.out.println("\n=== DÉTAILS TYPE #" + id + " ===");
                 System.out.println("Libellé: " + rs.getString("libelle"));
             } else {
-                System.out.println("❌ Type non trouvé!");
+                System.out.println(">> Type non trouvé!");
             }
             
             pstmt.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur consultation: " + e.getMessage());
+            System.err.println(">> Erreur consultation: " + e.getMessage());
         }
     }
     
@@ -123,7 +123,7 @@ public class TypeEpreuveService {
             stmt.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur liste: " + e.getMessage());
+            System.err.println(">> Erreur liste: " + e.getMessage());
         }
     }
     
@@ -143,7 +143,7 @@ public class TypeEpreuveService {
             stmt.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Erreur liste: " + e.getMessage());
+            System.err.println(">> Erreur liste: " + e.getMessage());
         }
     }
 }

@@ -1,10 +1,11 @@
 package JavaStocks.utils;
 
 public class Constants {
-    // ========= CONFIGURATION BASE DE DONNÉES =========
+    // ========= CONFIGURATION POSTGRESQL =========
+    // MODIFIEZ LE MOT DE PASSE ICI !
     public static final String DB_URL = "jdbc:postgresql://localhost:5432/javastocks";
-    public static final String DB_USER = "postgres";      // ← MODIFIER ICI
-    public static final String DB_PASSWORD = "password";  // ← MODIFIER ICI
+    public static final String DB_USER = "postgres";
+    public static final String DB_PASSWORD = "password"; // VOTRE MOT DE PASSE ICI
     
     // ========= SEUILS DE RÉAPPROVISIONNEMENT =========
     public static final int SEUIL_TEXTILE = 10;

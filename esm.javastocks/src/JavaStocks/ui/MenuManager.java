@@ -65,7 +65,7 @@ public class MenuManager {
                     continuer = false;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -111,7 +111,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -152,7 +152,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -193,7 +193,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -239,7 +239,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -270,7 +270,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -311,7 +311,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -352,7 +352,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -393,7 +393,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
@@ -434,7 +434,7 @@ public class MenuManager {
                     retour = true;
                     break;
                 default:
-                    System.out.println("❌ Choix invalide!");
+                    System.out.println(">> Choix invalide!");
                     pause();
             }
         }
