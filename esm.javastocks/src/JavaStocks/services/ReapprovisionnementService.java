@@ -1,374 +1,416 @@
 package JavaStocks.services;
 
-import JavaStocks.utils.Constants;
-import java.sql.*;
+import JavaStocks.dao.*;
+import JavaStocks.models.*;
+import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Service pour la gestion du réapprovisionnement
+ */
 public class ReapprovisionnementService {
-    private Connection connection;
     private Scanner scanner;
+    private FournisseurDAO fournisseurDAO;
+    private PointLivraisonDAO pointLivraisonDAO;
+    private DemandeReapprovisionnementDAO demandeDAO;
+    private ArticleDAO articleDAO;
     
-    public ReapprovisionnementService(Connection connection) {
-        this.connection = connection;
-        this.scanner = new Scanner(System.in);
+    public ReapprovisionnementService(Scanner scanner, FournisseurDAO fournisseurDAO,
+                                     PointLivraisonDAO pointLivraisonDAO,
+                                     DemandeReapprovisionnementDAO demandeDAO,
+                                     ArticleDAO articleDAO) {
+        this.scanner = scanner;
+        this.fournisseurDAO = fournisseurDAO;
+        this.pointLivraisonDAO = pointLivraisonDAO;
+        this.demandeDAO = demandeDAO;
+        this.articleDAO = articleDAO;
     }
     
-    // ========= CRÉER UNE DEMANDE DE RÉAPPROVISIONNEMENT =========
-    public void creerDemande() {
-        System.out.println("\n=== NOUVELLE DEMANDE DE RÉAPPROVISIONNEMENT ===");
+    /**
+     * Affiche le menu de gestion du réapprovisionnement
+     */
+    public void menuReapprovisionnement() {
+        boolean continuer = true;
         
-        try {
-            // Informations de base
-            System.out.print("Numéro de commande: ");
-            String numeroCommande = scanner.nextLine();
+        do {
+            System.out.println("\n=== GESTION RÉAPPROVISIONNEMENT ===");
+            System.out.println("1. Gestion Fournisseurs");
+            System.out.println("2. Gestion Points de Livraison");
+            System.out.println("3. Gestion Demandes de Réapprovisionnement");
+            System.out.println("4. Retour au menu principal");
+            System.out.print("Choix: ");
             
-            System.out.print("Date de commande (jj/mm/aaaa): ");
-            String dateStr = scanner.nextLine();
-            java.sql.Date dateCommande = java.sql.Date.valueOf(dateStr.replace("/", "-"));
+            String choix = scanner.nextLine();
             
-            // Sélection fournisseur
-            System.out.println("\nListe des fournisseurs:");
-            listerFournisseurs();
-            System.out.print("\nID du fournisseur: ");
-            int idFournisseur = Integer.parseInt(scanner.nextLine());
-            
-            // Sélection point de livraison
-            System.out.println("\nListe des points de livraison:");
-            listerPointsLivraison();
-            System.out.print("\nID du point de livraison: ");
-            int idPointLivraison = Integer.parseInt(scanner.nextLine());
-            
-            // Motif
-            System.out.print("Motif (R=Réappro, NP=Nouveau produit, UR=Urgence): ");
-            String motif = scanner.nextLine().toUpperCase();
-            
-            // Créer la demande
-            String sql = "INSERT INTO reapprovisionnement (numero_commande, date_commande, id_fournisseur, id_point_livraison, motif) " +
-                        "VALUES (?, ?, ?, ?, ?) RETURNING id";
-            
-            int idReappro = -1;
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                pstmt.setString(1, numeroCommande);
-                pstmt.setDate(2, dateCommande);
-                pstmt.setInt(3, idFournisseur);
-                pstmt.setInt(4, idPointLivraison);
-                pstmt.setString(5, motif);
-                
-                ResultSet rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    idReappro = rs.getInt(1);
-                }
+            switch (choix) {
+                case "1":
+                    menuFournisseurs();
+                    break;
+                case "2":
+                    menuPointsLivraison();
+                    break;
+                case "3":
+                    menuDemandesReappro();
+                    break;
+                case "4":
+                    continuer = false;
+                    break;
+                default:
+                    System.out.println("Choix invalide!");
             }
+        } while (continuer);
+    }
+    
+    /**
+     * Menu de gestion des fournisseurs
+     */
+    private void menuFournisseurs() {
+        boolean continuer = true;
+        
+        do {
+            System.out.println("\n=== GESTION FOURNISSEURS ===");
+            System.out.println("1. Créer un nouveau fournisseur");
+            System.out.println("2. Modifier un fournisseur");
+            System.out.println("3. Afficher les fournisseurs");
+            System.out.println("4. Retour");
+            System.out.print("Choix: ");
             
-            if (idReappro != -1) {
-                // Ajouter les articles
-                ajouterArticlesReapprovisionnement(idReappro);
-                System.out.println("\n>> Demande de réapprovisionnement créée avec ID: " + idReappro);
+            String choix = scanner.nextLine();
+            
+            switch (choix) {
+                case "1":
+                    creerFournisseur();
+                    break;
+                case "2":
+                    modifierFournisseur();
+                    break;
+                case "3":
+                    afficherFournisseurs();
+                    break;
+                case "4":
+                    continuer = false;
+                    break;
+                default:
+                    System.out.println("Choix invalide!");
             }
-            
-        } catch (Exception e) {
-            System.err.println(">> Erreur création: " + e.getMessage());
+        } while (continuer);
+    }
+    
+    /**
+     * Crée un nouveau fournisseur
+     */
+    private void creerFournisseur() {
+        System.out.println("\n--- Création d'un nouveau fournisseur ---");
+        
+        System.out.print("Nom: ");
+        String nom = scanner.nextLine();
+        
+        System.out.print("Rue: ");
+        String rue = scanner.nextLine();
+        
+        System.out.print("Code Postal: ");
+        String cp = scanner.nextLine();
+        
+        System.out.print("Ville: ");
+        String ville = scanner.nextLine();
+        
+        System.out.print("Téléphone: ");
+        String tel = scanner.nextLine();
+        
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        
+        Fournisseur fournisseur = new Fournisseur(0, nom, rue, cp, ville, tel, email);
+        
+        if (fournisseurDAO.creer(fournisseur)) {
+            System.out.println("Fournisseur créé avec succès! ID: " + fournisseur.getId());
+        } else {
+            System.out.println("Erreur lors de la création du fournisseur.");
         }
     }
     
-    private void ajouterArticlesReapprovisionnement(int idReappro) {
+    /**
+     * Affiche tous les fournisseurs
+     */
+    private void afficherFournisseurs() {
+        System.out.println("\n--- Liste des fournisseurs ---");
+        List<Fournisseur> fournisseurs = fournisseurDAO.getAll();
+        
+        if (fournisseurs.isEmpty()) {
+            System.out.println("Aucun fournisseur enregistré.");
+        } else {
+            for (Fournisseur f : fournisseurs) {
+                System.out.println(f);
+            }
+        }
+    }
+    
+    /**
+     * Menu de gestion des points de livraison
+     */
+    private void menuPointsLivraison() {
         boolean continuer = true;
         
-        while (continuer) {
-            System.out.println("\n=== AJOUT D'ARTICLES À LA COMMANDE ===");
+        do {
+            System.out.println("\n=== GESTION POINTS DE LIVRAISON ===");
+            System.out.println("1. Créer un nouveau point de livraison");
+            System.out.println("2. Afficher les points de livraison");
+            System.out.println("3. Retour");
+            System.out.print("Choix: ");
             
-            // Lister les articles qui ont besoin de réapprovisionnement
-            String sqlRuptures = """
-                SELECT a.* FROM article a 
-                WHERE a.suppression_logique = false 
-                AND ((a.categorie = 'T' AND a.quantite <= ?) 
-                     OR (a.categorie = 'B' AND a.quantite <= ?) 
-                     OR (a.categorie = 'DS' AND a.quantite <= ?))
-                ORDER BY a.quantite ASC
-                """;
-                
-            try (PreparedStatement pstmt = connection.prepareStatement(sqlRuptures)) {
-                pstmt.setInt(1, Constants.SEUIL_TEXTILE);
-                pstmt.setInt(2, Constants.SEUIL_BOISSON);
-                pstmt.setInt(3, Constants.SEUIL_DENREE);
-                
-                ResultSet rs = pstmt.executeQuery();
-                
-                System.out.println("\nArticles en rupture ou faible stock:");
-                System.out.println("ID  | Libellé                       | Cat  | Stock | Seuil");
-                System.out.println("----+-------------------------------+------+-------+-------");
-                
-                int count = 0;
-                while (rs.next()) {
-                    count++;
-                    System.out.printf("%3d | %-30s | %-4s | %5d | %s\n",
-                        rs.getInt("id"),
-                        rs.getString("libelle"),
-                        rs.getString("categorie"),
-                        rs.getInt("quantite"),
-                        getSeuilPourCategorie(rs.getString("categorie")));
-                }
-                
-                if (count == 0) {
-                    System.out.println(">> Aucun article en rupture de stock.");
-                }
-            } catch (SQLException e) {
-                System.err.println(">> Erreur liste ruptures: " + e.getMessage());
+            String choix = scanner.nextLine();
+            
+            switch (choix) {
+                case "1":
+                    creerPointLivraison();
+                    break;
+                case "2":
+                    afficherPointsLivraison();
+                    break;
+                case "3":
+                    continuer = false;
+                    break;
+                default:
+                    System.out.println("Choix invalide!");
+            }
+        } while (continuer);
+    }
+    
+    /**
+     * Crée un nouveau point de livraison
+     */
+    private void creerPointLivraison() {
+        System.out.println("\n--- Création d'un nouveau point de livraison ---");
+        
+        System.out.print("Nom: ");
+        String nom = scanner.nextLine();
+        
+        System.out.print("Rue: ");
+        String rue = scanner.nextLine();
+        
+        System.out.print("Code Postal: ");
+        String cp = scanner.nextLine();
+        
+        System.out.print("Ville: ");
+        String ville = scanner.nextLine();
+        
+        System.out.print("Téléphone: ");
+        String tel = scanner.nextLine();
+        
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        
+        PointLivraison point = new PointLivraison(0, nom, rue, cp, ville, tel, email);
+        
+        if (pointLivraisonDAO.creer(point)) {
+            System.out.println("Point de livraison créé avec succès! ID: " + point.getId());
+        } else {
+            System.out.println("Erreur lors de la création du point de livraison.");
+        }
+    }
+    
+    /**
+     * Affiche tous les points de livraison
+     */
+    private void afficherPointsLivraison() {
+        System.out.println("\n--- Liste des points de livraison ---");
+        List<PointLivraison> points = pointLivraisonDAO.getAll();
+        
+        if (points.isEmpty()) {
+            System.out.println("Aucun point de livraison enregistré.");
+        } else {
+            for (PointLivraison p : points) {
+                System.out.println(p);
+            }
+        }
+    }
+    
+    /**
+     * Modifie un fournisseur existant
+     */
+    private void modifierFournisseur() {
+        afficherFournisseurs();
+        System.out.print("\nID du fournisseur à modifier: ");
+        
+        try {
+            int id = Integer.parseInt(scanner.nextLine());
+            Fournisseur fournisseur = fournisseurDAO.getById(id);
+            
+            if (fournisseur == null) {
+                System.out.println("Fournisseur non trouvé!");
+                return;
             }
             
-            // Demander article et quantité
-            System.out.print("\nID de l'article à commander (0 pour terminer): ");
-            int idArticle = Integer.parseInt(scanner.nextLine());
+            System.out.println("\nModification du fournisseur: " + fournisseur);
             
-            if (idArticle == 0) {
-                continuer = false;
+            System.out.print("Nouveau nom [" + fournisseur.getNom() + "]: ");
+            String nom = scanner.nextLine();
+            if (!nom.isEmpty()) fournisseur.setNom(nom);
+            
+            System.out.print("Nouvelle rue [" + fournisseur.getRue() + "]: ");
+            String rue = scanner.nextLine();
+            if (!rue.isEmpty()) fournisseur.setRue(rue);
+            
+            System.out.print("Nouveau code postal [" + fournisseur.getCodePostal() + "]: ");
+            String cp = scanner.nextLine();
+            if (!cp.isEmpty()) fournisseur.setCodePostal(cp);
+            
+            System.out.print("Nouvelle ville [" + fournisseur.getVille() + "]: ");
+            String ville = scanner.nextLine();
+            if (!ville.isEmpty()) fournisseur.setVille(ville);
+            
+            System.out.print("Nouveau téléphone [" + fournisseur.getTelephone() + "]: ");
+            String tel = scanner.nextLine();
+            if (!tel.isEmpty()) fournisseur.setTelephone(tel);
+            
+            System.out.print("Nouvel email [" + fournisseur.getEmail() + "]: ");
+            String email = scanner.nextLine();
+            if (!email.isEmpty()) fournisseur.setEmail(email);
+            
+            if (fournisseurDAO.modifier(fournisseur)) {
+                System.out.println("Fournisseur modifié avec succès!");
+            } else {
+                System.out.println("Erreur lors de la modification.");
+            }
+            
+        } catch (NumberFormatException e) {
+            System.out.println("ID invalide!");
+        }
+    }
+    
+    /**
+     * Menu de gestion des demandes de réapprovisionnement
+     */
+    private void menuDemandesReappro() {
+        boolean continuer = true;
+        
+        do {
+            System.out.println("\n=== GESTION DEMANDES RÉAPPROVISIONNEMENT ===");
+            System.out.println("1. Créer une nouvelle demande");
+            System.out.println("2. Afficher les demandes");
+            System.out.println("3. Retour");
+            System.out.print("Choix: ");
+            
+            String choix = scanner.nextLine();
+            
+            switch (choix) {
+                case "1":
+                    creerDemandeReappro();
+                    break;
+                case "2":
+                    afficherDemandes();
+                    break;
+                case "3":
+                    continuer = false;
+                    break;
+                default:
+                    System.out.println("Choix invalide!");
+            }
+        } while (continuer);
+    }
+    
+    /**
+     * Crée une nouvelle demande de réapprovisionnement
+     */
+    private void creerDemandeReappro() {
+        System.out.println("\n--- Création d'une demande de réapprovisionnement ---");
+        
+        // Sélection du fournisseur
+        afficherFournisseurs();
+        System.out.print("ID du fournisseur: ");
+        int fournisseurId = Integer.parseInt(scanner.nextLine());
+        Fournisseur fournisseur = fournisseurDAO.getById(fournisseurId);
+        
+        if (fournisseur == null) {
+            System.out.println("Fournisseur non trouvé!");
+            return;
+        }
+        
+        // Sélection du point de livraison
+        afficherPointsLivraison();
+        System.out.print("ID du point de livraison: ");
+        int pointId = Integer.parseInt(scanner.nextLine());
+        PointLivraison point = pointLivraisonDAO.getById(pointId);
+        
+        if (point == null) {
+            System.out.println("Point de livraison non trouvé!");
+            return;
+        }
+        
+        // Choix du motif
+        System.out.println("\nMotifs disponibles:");
+        System.out.println("R - Réapprovisionnement normal");
+        System.out.println("NP - Nouveaux produits");
+        System.out.println("UR - Urgence réapprovisionnement");
+        System.out.print("Motif: ");
+        String motif = scanner.nextLine().toUpperCase();
+        
+        // Création de la demande
+        DemandeReapprovisionnement demande = new DemandeReapprovisionnement(
+            0, new java.util.Date(), motif, fournisseur, point
+        );
+        
+        // Ajout des articles
+        boolean ajouterArticles = true;
+        while (ajouterArticles) {
+            System.out.println("\n--- Ajout d'articles à la demande ---");
+            
+            // Afficher les articles disponibles
+            List<Article> articles = articleDAO.getAll();
+            for (Article a : articles) {
+                System.out.println(a);
+            }
+            
+            System.out.print("ID de l'article (0 pour terminer): ");
+            int articleId = Integer.parseInt(scanner.nextLine());
+            
+            if (articleId == 0) {
+                ajouterArticles = false;
                 continue;
             }
             
-            System.out.print("Quantité à commander: ");
+            Article article = articleDAO.getById(articleId);
+            if (article == null) {
+                System.out.println("Article non trouvé!");
+                continue;
+            }
+            
+            System.out.print("Quantité: ");
             int quantite = Integer.parseInt(scanner.nextLine());
             
-            // Ajouter à la commande
-            try {
-                String sql = "INSERT INTO ligne_reapprovisionnement (id_reappro, id_article, quantite) VALUES (?, ?, ?)";
-                try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                    pstmt.setInt(1, idReappro);
-                    pstmt.setInt(2, idArticle);
-                    pstmt.setInt(3, quantite);
-                    pstmt.executeUpdate();
-                    System.out.println(">> Article ajouté à la commande.");
-                }
-            } catch (SQLException e) {
-                System.err.println(">> Erreur ajout article: " + e.getMessage());
-            }
-            
-            System.out.print("Ajouter un autre article? (o/n): ");
-            String reponse = scanner.nextLine().toLowerCase();
-            if (!reponse.equals("o")) {
-                continuer = false;
-            }
+            demande.ajouterLigne(article, quantite);
+            System.out.println("Article ajouté à la demande.");
         }
-    }
-    
-    private int getSeuilPourCategorie(String categorie) {
-        switch (categorie) {
-            case "T": return Constants.SEUIL_TEXTILE;
-            case "B": return Constants.SEUIL_BOISSON;
-            case "DS": return Constants.SEUIL_DENREE;
-            default: return 0;
-        }
-    }
-    
-    // ========= GESTION FOURNISSEURS =========
-    public void creerFournisseur() {
-        System.out.println("\n=== NOUVEAU FOURNISSEUR ===");
         
-        try {
-            System.out.print("Nom: ");
-            String nom = scanner.nextLine();
-            
-            System.out.print("Rue: ");
-            String rue = scanner.nextLine();
-            
-            System.out.print("Code postal: ");
-            String codePostal = scanner.nextLine();
-            
-            System.out.print("Ville: ");
-            String ville = scanner.nextLine();
-            
-            System.out.print("Téléphone: ");
-            String telephone = scanner.nextLine();
-            
-            System.out.print("Email: ");
-            String email = scanner.nextLine();
-            
-            String sql = "INSERT INTO fournisseur (nom, rue, code_postal, ville, telephone, email) " +
-                        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
-            
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                pstmt.setString(1, nom);
-                pstmt.setString(2, rue);
-                pstmt.setString(3, codePostal);
-                pstmt.setString(4, ville);
-                pstmt.setString(5, telephone);
-                pstmt.setString(6, email);
-                
-                ResultSet rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    System.out.println(">> Fournisseur créé avec ID: " + rs.getInt(1));
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(">> Erreur création: " + e.getMessage());
+        // Sauvegarde de la demande
+        if (demandeDAO.creer(demande)) {
+            System.out.println("Demande de réapprovisionnement créée avec succès! ID: " + demande.getId());
+            System.out.println("Montant total: " + demande.calculerMontantTotal() + " €");
+        } else {
+            System.out.println("Erreur lors de la création de la demande.");
         }
     }
     
-    public void modifierFournisseur() {
-        System.out.println("\n=== MODIFICATION FOURNISSEUR ===");
-        System.out.println("Fonctionnalité à implémenter...");
-    }
-    
-    public void consulterFournisseur() {
-        System.out.println("\n=== CONSULTATION FOURNISSEUR ===");
-        System.out.println("Fonctionnalité à implémenter...");
-    }
-    
-    public void listerFournisseurs() {
-        System.out.println("\n=== LISTE DES FOURNISSEURS ===");
+    /**
+     * Affiche toutes les demandes
+     */
+    private void afficherDemandes() {
+        System.out.println("\n--- Liste des demandes de réapprovisionnement ---");
+        List<DemandeReapprovisionnement> demandes = demandeDAO.getAll();
         
-        try {
-            String sql = "SELECT * FROM fournisseur ORDER BY nom";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                
-                int count = 0;
-                System.out.println("ID  | Nom                 | Ville           | Téléphone");
-                System.out.println("----+---------------------+-----------------+----------------");
-                
-                while (rs.next()) {
-                    count++;
-                    System.out.printf("%3d | %-20s | %-15s | %s\n",
-                        rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("ville"),
-                        rs.getString("telephone"));
+        if (demandes.isEmpty()) {
+            System.out.println("Aucune demande enregistrée.");
+        } else {
+            for (DemandeReapprovisionnement d : demandes) {
+                System.out.println("\n" + d);
+                System.out.println("Fournisseur: " + d.getFournisseur().getNom());
+                System.out.println("Point de livraison: " + d.getPointLivraison().getNom());
+                System.out.println("Articles:");
+                for (LigneDemande ligne : d.getLignes()) {
+                    System.out.println("  - " + ligne);
                 }
-                
-                if (count == 0) {
-                    System.out.println(">> Aucun fournisseur enregistré.");
-                } else {
-                    System.out.println("\nTotal: " + count + " fournisseur(s)");
-                }
+                System.out.println("Montant total: " + d.calculerMontantTotal() + " €");
             }
-        } catch (Exception e) {
-            System.err.println(">> Erreur liste: " + e.getMessage());
-        }
-    }
-    
-    // ========= GESTION POINTS DE LIVRAISON =========
-    public void creerPointLivraison() {
-        System.out.println("\n=== NOUVEAU POINT DE LIVRAISON ===");
-        
-        try {
-            System.out.print("Nom: ");
-            String nom = scanner.nextLine();
-            
-            System.out.print("Rue: ");
-            String rue = scanner.nextLine();
-            
-            System.out.print("Code postal: ");
-            String codePostal = scanner.nextLine();
-            
-            System.out.print("Ville: ");
-            String ville = scanner.nextLine();
-            
-            System.out.print("Téléphone: ");
-            String telephone = scanner.nextLine();
-            
-            System.out.print("Email: ");
-            String email = scanner.nextLine();
-            
-            String sql = "INSERT INTO point_livraison (nom, rue, code_postal, ville, telephone, email) " +
-                        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
-            
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                pstmt.setString(1, nom);
-                pstmt.setString(2, rue);
-                pstmt.setString(3, codePostal);
-                pstmt.setString(4, ville);
-                pstmt.setString(5, telephone);
-                pstmt.setString(6, email);
-                
-                ResultSet rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    System.out.println(">> Point de livraison créé avec ID: " + rs.getInt(1));
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(">> Erreur création: " + e.getMessage());
-        }
-    }
-    
-    public void modifierPointLivraison() {
-        System.out.println("\n=== MODIFICATION POINT DE LIVRAISON ===");
-        System.out.println("Fonctionnalité à implémenter...");
-    }
-    
-    public void consulterPointLivraison() {
-        System.out.println("\n=== CONSULTATION POINT DE LIVRAISON ===");
-        System.out.println("Fonctionnalité à implémenter...");
-    }
-    
-    public void listerPointsLivraison() {
-        System.out.println("\n=== LISTE DES POINTS DE LIVRAISON ===");
-        
-        try {
-            String sql = "SELECT * FROM point_livraison ORDER BY nom";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                
-                int count = 0;
-                System.out.println("ID  | Nom                 | Ville           | Téléphone");
-                System.out.println("----+---------------------+-----------------+----------------");
-                
-                while (rs.next()) {
-                    count++;
-                    System.out.printf("%3d | %-20s | %-15s | %s\n",
-                        rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("ville"),
-                        rs.getString("telephone"));
-                }
-                
-                if (count == 0) {
-                    System.out.println(">> Aucun point de livraison enregistré.");
-                } else {
-                    System.out.println("\nTotal: " + count + " point(s) de livraison");
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(">> Erreur liste: " + e.getMessage());
-        }
-    }
-    
-    // ========= LISTER LES DEMANDES DE RÉAPPROVISIONNEMENT =========
-    public void listerDemandes() {
-        System.out.println("\n=== DEMANDES DE RÉAPPROVISIONNEMENT ===");
-        
-        try {
-            String sql = """
-                SELECT r.*, f.nom as fournisseur, pl.nom as point_livraison
-                FROM reapprovisionnement r
-                LEFT JOIN fournisseur f ON r.id_fournisseur = f.id
-                LEFT JOIN point_livraison pl ON r.id_point_livraison = pl.id
-                ORDER BY r.date_commande DESC
-                """;
-                
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                
-                int count = 0;
-                System.out.println("ID  | N° Commande    | Date       | Fournisseur       | Statut");
-                System.out.println("----+----------------+------------+-------------------+--------");
-                
-                while (rs.next()) {
-                    count++;
-                    System.out.printf("%3d | %-14s | %s | %-17s | %s\n",
-                        rs.getInt("id"),
-                        rs.getString("numero_commande"),
-                        rs.getDate("date_commande"),
-                        rs.getString("fournisseur"),
-                        rs.getString("statut"));
-                }
-                
-                if (count == 0) {
-                    System.out.println(">> Aucune demande de réapprovisionnement.");
-                } else {
-                    System.out.println("\nTotal: " + count + " demande(s)");
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(">> Erreur liste: " + e.getMessage());
         }
     }
 }

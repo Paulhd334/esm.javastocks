@@ -1,30 +1,36 @@
 package JavaStocks.models;
 
-import JavaStocks.utils.Constants;
-
 public class Boisson extends Article {
-    private double volume; // en centilitres
+    private int volume; // en cl
     
-    public Boisson(int id, String libelle, int quantite, double volume) {
-        super(id, libelle, Constants.CATEGORIE_BOISSON, quantite);
+    // Constructeur vide
+    public Boisson() {
+        super(0, "", "B", 0); // "B" pour Boisson
+    }
+    
+    // Constructeur complet
+    public Boisson(int id, String libelle, int quantite, int volume) {
+        super(id, libelle, "B", quantite);
         this.volume = volume;
     }
     
-    public double getVolume() { return volume; }
-    public void setVolume(double volume) { this.volume = volume; }
+    // Getters et setters
+    public int getVolume() { return volume; }
+    public void setVolume(int volume) { this.volume = volume; }
     
+    // Implémentation des méthodes abstraites
     @Override
     public String getDetailsSpecifiques() {
-        return String.format("Volume: %.1f cl", volume);
+        return "Volume: " + volume + "cl";
     }
     
     @Override
     public boolean besoinReapprovisionnement() {
-        return quantite <= Constants.SEUIL_BOISSON;
+        return getQuantite() <= 100; // Seuil pour boisson: 100
     }
     
     @Override
     public String toString() {
-        return super.toString() + String.format(" | %.1f cl", volume);
+        return super.toString() + String.format(" | Volume: %dcl", volume);
     }
 }

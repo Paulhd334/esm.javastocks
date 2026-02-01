@@ -5,13 +5,15 @@ public class Coureur {
     private String nom;
     private String prenom;
     
+    public Coureur() {}
+    
     public Coureur(int id, String nom, String prenom) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
     }
     
-    // Getters & Setters
+    // Getters et setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     
@@ -21,18 +23,8 @@ public class Coureur {
     public String getPrenom() { return prenom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
     
-    public String getNomComplet() {
-        return prenom + " " + nom;
-    }
-    
     @Override
     public String toString() {
-        return String.format("%4d | %-20s | %-15s", id, nom, prenom);
-    }
-    
-    public void afficher() {
-        System.out.println("\n=== COUREUR #" + id + " ===");
-        System.out.println("Nom: " + nom);
-        System.out.println("Prénom: " + prenom);
+        return String.format("[%d] %s %s", id, prenom, nom);
     }
 }
