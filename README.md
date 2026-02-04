@@ -34,7 +34,7 @@ esm.javastocks/
 └── README.md
 
 
-
+JavaStocks DB
 
 
 
@@ -58,4 +58,3 @@ esm.javastocks/
                                                   | + delete()     |
                                                   +----------------+
 
-                                                  

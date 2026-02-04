@@ -1,0 +1,74 @@
+{
+  // ============================================
+  // CONFIGURATION POSTGRESQL POUR VS CODE
+  // ============================================
+  "postgresql.connections": [
+    {
+      "host": "127.0.0.1",
+      "port": 5432,
+      "database": "javastocks",
+      "username": "postgres",
+      "password": "password", // ←  MOT DE PASSE DE Constants.java
+      "ssl": false,
+      "connectTimeout": 30,
+      "savePassword": true,
+      "name": "JavaStocks Database"
+    }
+  ],
+  // ============================================
+  // CONFIGURATION JAVA
+  // ============================================
+  "java.project.sourcePaths": [
+    "src"
+  ],
+  "java.project.outputPath": "bin",
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar"
+  ],
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+  // UTF-8 pour éviter les erreurs
+  "java.compile.nullAnalysis.mode": "automatic",
+  "files.encoding": "utf8",
+  // ============================================
+  // POUR L'EXTENSION "DATABASE CLIENT"
+  // ============================================
+  "database-client.connections": [
+    {
+      "type": "postgresql",
+      "name": "JavaStocks DB",
+      "host": "127.0.0.1",
+      "port": 5432,
+      "database": "javastocks",
+      "username": "postgres",
+      "password": "password",
+      "ssl": false,
+      "active": true
+    }
+  ],
+  // ============================================
+  // CONFIGURATION GÉNÉRALE
+  // ============================================
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  // IGNORE DES FICHIERS
+  "files.exclude": {
+    "**/bin": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/*~": true
+  },
+  // TERMINAL
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.env.windows": {
+    "JAVA_HOME": "C:\\Program Files\\Java\\jdk-17"
+  },
+  // GIT
+  "git.autofetch": true,
+  "git.enableSmartCommit": true
+}

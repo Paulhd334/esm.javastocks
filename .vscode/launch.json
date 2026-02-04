@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Main Class",
+            "request": "launch",
+            "mainClass": "JavaStocks.Main",
+            "projectName": "esm.javastocks",
+            "args": "",
+            "env": {
+                "DB_URL": "jdbc:postgresql://127.0.0.1:5432/javastocks",
+                "DB_USER": "postgres",
+                "DB_PASSWORD": "password"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        }
+    ]
+}
