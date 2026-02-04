@@ -1,11 +1,61 @@
-# PROJET JAVA STOCKS - Association Web Courses
+📋 DOCUMENTATION TECHNIQUE - JavaStocks 
 
-## Configuration initiale
-1. Installer PostgreSQL
-2. Créer la base de données : javastocks
-3. Ajouter le driver PostgreSQL dans le dossier lib/
+esm.javastocks/
+├── src/
+│   └── JavaStocks/
+│       ├── Main.java                          # Point d'entrée + CAPTCHA
+│       ├── Captcha.java                       # Module de vérification humaine
+│       ├── database/
+│       │   ├── DatabaseConnection.java        # Connexion PostgreSQL
+│       │   ├── DatabaseInitializer.java       # Création des tables
+│       │   └── DonneesTest.java               # Données de démonstration
+│       ├── dao/ (Data Access Objects)
+│       │   ├── ArticleDAO.java
+│       │   ├── CoureurDAO.java
+│       │   ├── TypeEpreuveDAO.java
+│       │   ├── ReservationDAO.java
+│       │   ├── ReservationEnAttenteDAO.java
+│       │   ├── FournisseurDAO.java
+│       │   ├── PointLivraisonDAO.java
+│       │   └── DemandeReapprovisionnementDAO.java
+│       ├── services/
+│       │   ├── ArticleService.java
+│       │   ├── CoureurService.java
+│       │   ├── TypeEpreuveService.java
+│       │   ├── ReservationService.java
+│       │   └── ReapprovisionnementService.java
+│       └── ui/
+│           └── MenuManager.java               # Gestionnaire des menus
+├── sql/
+│   ├── creation_tables.sql                    # Script SQL des tables
+│   └── donnees_test.sql                       # Données d'exemple
+├── docs/                                      # Documentation
+├── compile_and_run.bat                        # Script Windows
+└── README.md
 
-## Compilation et exécution
-```bash
-javac -cp "lib/*" -d bin src/JavaStocks/**/*.java
-java -cp "bin:lib/*" JavaStocks.Main
+
+
+
+
+
+
+
++----------------+       +----------------+       +----------------+
+|    Main        |       |  MenuManager   |       |   *Service     |
+|----------------|       |----------------|       |----------------|
+| + main()       |------>| + showMainMenu()|----->| + creer()      |
+| + validerCaptcha()|   | + showMenuX()   |      | + modifier()   |
++----------------+       +----------------+       | + consulter()  |
+                                                  | + supprimer()  |
+                                                  +--------+-------+
+                                                           |
+                                                  +--------v-------+
+                                                  |      *DAO      |
+                                                  |----------------|
+                                                  | + create()     |
+                                                  | + read()       |
+                                                  | + update()     |
+                                                  | + delete()     |
+                                                  +----------------+
+
+                                                  

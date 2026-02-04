@@ -23,10 +23,10 @@ public class DatabaseConnection {
                 
                 // Configuration
                 connection.setAutoCommit(true);
-                System.out.println("✅ Connexion PostgreSQL établie: " + Constants.DB_URL);
+                System.out.println(" Connexion PostgreSQL établie: " + Constants.DB_URL);
                 
             } catch (ClassNotFoundException e) {
-                throw new SQLException("❌ Driver PostgreSQL non trouvé. Ajoutez postgresql.jar dans lib/");
+                throw new SQLException(" Driver PostgreSQL non trouvé. Ajoutez postgresql.jar dans lib/");
             }
         }
         return connection;
@@ -36,10 +36,10 @@ public class DatabaseConnection {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("🔌 Connexion fermée");
+                System.out.println(" Connexion fermée");
             }
         } catch (SQLException e) {
-            System.err.println("❌ Erreur fermeture connexion: " + e.getMessage());
+            System.err.println(" Erreur fermeture connexion: " + e.getMessage());
         }
     }
     
@@ -48,11 +48,11 @@ public class DatabaseConnection {
         try {
             Connection testConn = getConnection();
             if (testConn != null && !testConn.isClosed()) {
-                System.out.println("✅ Test connexion: OK");
+                System.out.println(" Test connexion: OK");
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("❌ Test connexion: ÉCHEC - " + e.getMessage());
+            System.err.println(" Test connexion: ÉCHEC - " + e.getMessage());
         }
         return false;
     }
