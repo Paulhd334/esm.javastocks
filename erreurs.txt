@@ -1,0 +1,3 @@
+error: Invalid filename: src/JavaStocks/**/*.java
+Usage: javac <options> <source files>
+use --help for a list of possible options
